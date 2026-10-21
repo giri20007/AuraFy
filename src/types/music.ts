@@ -1,13 +1,16 @@
 export interface Track {
-  id: string; // YouTube video ID
+  id: string;
   title: string;
   artist: string;
-  album?: string;
+  album: string;
   thumbnail: string;
+  audioUrl?: string; // Direct audio stream for instant mobile playback
+  youtubeId?: string; // YouTube video ID for video mode
   duration: string; // "3:45"
   durationSeconds: number;
-  accentColor: string; // Hex color for hero gradient e.g. "#1e3a8a"
+  accentColor: string; // Hex color for hero gradient & glass glow e.g. "#8400e7"
   views?: string;
+  previewUrl?: string;
 }
 
 export interface Playlist {

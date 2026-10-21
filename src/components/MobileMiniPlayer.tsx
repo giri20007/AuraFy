@@ -28,33 +28,41 @@ export default function MobileMiniPlayer({ onOpenFullPlayer }: MobileMiniPlayerP
   return (
     <div
       onClick={onOpenFullPlayer}
-      className="md:hidden fixed bottom-[70px] inset-x-2 h-14 rounded-lg bg-[#242424]/95 backdrop-blur-md border border-white/10 shadow-2xl z-40 flex items-center justify-between px-2.5 overflow-hidden cursor-pointer select-none"
+      className="md:hidden fixed bottom-[76px] inset-x-3.5 h-[60px] rounded-2xl glass-dock shadow-2xl z-40 flex items-center justify-between px-3 overflow-hidden cursor-pointer select-none active:scale-[0.99] transition-transform duration-200"
       style={{
-        backgroundImage: `linear-gradient(90deg, ${activeColor}55 0%, #1e1e1e 100%)`,
+        boxShadow: `0 12px 36px -8px ${activeColor || '#8400e7'}40, 0 0 0 1px rgba(255, 255, 255, 0.12)`,
       }}
     >
+      {/* Dynamic ambient gradient glow */}
+      <div
+        className="absolute inset-0 opacity-20 pointer-events-none transition-colors duration-700"
+        style={{
+          background: `linear-gradient(90deg, ${activeColor || '#8400e7'} 0%, transparent 80%)`,
+        }}
+      />
+
       {/* Left: Thumbnail & Song Info */}
-      <div className="flex items-center gap-3 min-w-0 flex-1">
+      <div className="flex items-center gap-3 min-w-0 flex-1 relative z-10">
         <img
           src={currentTrack.thumbnail}
           alt={currentTrack.title}
-          className="w-10 h-10 rounded-md object-cover shrink-0 shadow"
+          className="w-11 h-11 rounded-xl object-cover shrink-0 shadow-md border border-white/10"
         />
         <div className="min-w-0 flex-1 pr-2">
-          <p className="text-xs font-bold text-white truncate">
+          <p className="text-xs font-bold text-white truncate tracking-tight">
             {currentTrack.title}
           </p>
-          <p className="text-[11px] text-[#b3b3b3] truncate">
+          <p className="text-[11px] text-[#b3b3b3] truncate mt-0.5">
             {currentTrack.artist}
           </p>
         </div>
       </div>
 
       {/* Right: Like & Play/Pause */}
-      <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+      <div className="flex items-center gap-2 relative z-10" onClick={(e) => e.stopPropagation()}>
         <button
           onClick={() => toggleLike(currentTrack)}
-          className={`p-1.5 transition ${
+          className={`p-2 transition active:scale-90 ${
             liked ? 'text-[#1DB954]' : 'text-white/60 hover:text-white'
           }`}
           title={liked ? 'Unlike' : 'Like'}
@@ -64,7 +72,7 @@ export default function MobileMiniPlayer({ onOpenFullPlayer }: MobileMiniPlayerP
 
         <button
           onClick={togglePlayPause}
-          className="w-8 h-8 rounded-full bg-white text-black flex items-center justify-center hover:scale-105 active:scale-95 transition"
+          className="w-9 h-9 rounded-full bg-white text-black flex items-center justify-center hover:scale-105 active:scale-95 transition shadow-lg"
           title={isPlaying ? 'Pause' : 'Play'}
         >
           {isPlaying ? (
@@ -75,10 +83,10 @@ export default function MobileMiniPlayer({ onOpenFullPlayer }: MobileMiniPlayerP
         </button>
       </div>
 
-      {/* Thin playback progress bar at the bottom */}
-      <div className="absolute bottom-0 inset-x-0 h-[2.5px] bg-white/20">
+      {/* Thin glowing playback progress bar */}
+      <div className="absolute bottom-0 inset-x-0 h-[2.5px] bg-white/10">
         <div
-          className="h-full bg-[#1DB954] transition-all duration-150"
+          className="h-full bg-[#1DB954] shadow-[0_0_8px_#1DB954] transition-all duration-150"
           style={{ width: `${progressPercent}%` }}
         />
       </div>

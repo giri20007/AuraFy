@@ -2,6 +2,7 @@
 
 import React, { useState, useRef } from 'react';
 import { PlayerProvider, usePlayer } from '@/context/PlayerContext';
+import AmbientBackground from '@/components/AmbientBackground';
 import Sidebar from '@/components/Sidebar';
 import TopNav from '@/components/TopNav';
 import PlayerBar from '@/components/PlayerBar';
@@ -22,7 +23,6 @@ function MainAppShell() {
   const {
     activeView,
     selectedPlaylist,
-    activeColor,
   } = usePlayer();
 
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -37,22 +37,20 @@ function MainAppShell() {
   };
 
   return (
-    <div className="flex flex-col h-screen w-screen overflow-hidden bg-black text-white font-sans antialiased selection:bg-[#1DB954] selection:text-black">
-      {/* Top Body: Left Sidebar (Desktop only) + Main Viewport (Full width on Mobile) */}
+    <div className="flex flex-col h-screen w-screen overflow-hidden text-white font-sans antialiased selection:bg-[#1DB954] selection:text-black relative">
+      {/* iOS 17 Dynamic Liquid Ambient Glow Background */}
+      <AmbientBackground />
+
+      {/* Top Body: Left Sidebar (Desktop) + Main Viewport (Full width on Mobile) */}
       <div className="flex-1 flex min-h-0 overflow-hidden relative">
-        {/* Left Sidebar (Desktop only: hidden md:flex) */}
+        {/* Left Sidebar (Desktop only) */}
         <Sidebar onOpenCreateModal={() => setIsCreateModalOpen(true)} />
 
-        {/* Center Main Viewport (Full width on mobile, rounded card on desktop) */}
+        {/* Center Main Viewport with iOS 17 Glass styling */}
         <main
           ref={mainContentRef}
           onScroll={handleScroll}
-          className="flex-1 md:rounded-xl bg-[#121212] md:my-2 md:mr-2 overflow-y-auto relative flex flex-col transition-colors duration-700 w-full"
-          style={{
-            backgroundImage: `radial-gradient(ellipse 80% 50% at 50% -20%, ${
-              activeColor || '#1e3264'
-            }40, transparent 70%)`,
-          }}
+          className="flex-1 md:rounded-2xl glass-panel md:my-2 md:mr-2 overflow-y-auto relative flex flex-col w-full shadow-2xl"
         >
           {/* Sticky Top Navigation */}
           <TopNav scrolled={scrolled} />
@@ -71,26 +69,26 @@ function MainAppShell() {
           </div>
         </main>
 
-        {/* Queue Drawer (Desktop & Mobile) */}
+        {/* Queue Drawer */}
         <QueueDrawer />
 
         {/* Synced Lyrics Fullscreen/Drawer */}
         <LyricsModal />
       </div>
 
-      {/* YouTube Playback Engine (Background audio & PiP canvas video) */}
+      {/* YouTube Playback Engine (Optional Canvas/Video Mode) */}
       <YouTubeEngine />
 
-      {/* DESKTOP: Persistent Bottom Spotify Player Bar */}
+      {/* DESKTOP: Persistent Bottom Spotify Glass Player Bar */}
       <PlayerBar />
 
-      {/* MOBILE: Floating Mini Player (right above bottom nav) */}
+      {/* MOBILE: Floating Glass Mini Player */}
       <MobileMiniPlayer onOpenFullPlayer={() => setIsMobileFullPlayerOpen(true)} />
 
-      {/* MOBILE: Fixed Bottom Navigation Bar (Home, Search, Library) */}
+      {/* MOBILE: Fixed Glass Bottom Dock (Home, Search, Library) */}
       <MobileBottomNav />
 
-      {/* MOBILE: Expandable Full-Screen Now Playing Screen */}
+      {/* MOBILE: Expandable Full-Screen iOS 17 Now Playing Screen */}
       <MobileNowPlayingModal
         isOpen={isMobileFullPlayerOpen}
         onClose={() => setIsMobileFullPlayerOpen(false)}

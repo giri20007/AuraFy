@@ -60,7 +60,7 @@ interface PlayerContextType {
   setIsVideoMode: (open: boolean) => void;
   setActiveColor: (color: string) => void;
 
-  // YouTube ref
+  // YouTube registration
   registerPlayer: (player: any) => void;
 }
 
@@ -71,7 +71,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [currentTime, setCurrentTime] = useState<number>(0);
   const [duration, setDuration] = useState<number>(0);
-  const [volume, setVolumeState] = useState<number>(80);
+  const [volume, setVolumeState] = useState<number>(85);
   const [isMuted, setIsMuted] = useState<boolean>(false);
   const [isShuffle, setIsShuffle] = useState<boolean>(false);
   const [repeatMode, setRepeatMode] = useState<RepeatMode>('off');
@@ -81,7 +81,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
   // Persistent storage state
   const [likedTracks, setLikedTracks] = useState<Track[]>([]);
   const [customPlaylists, setCustomPlaylists] = useState<Playlist[]>([]);
-  
+
   // UI state
   const [activeView, setActiveView] = useState<ActiveView>('home');
   const [selectedPlaylist, setSelectedPlaylist] = useState<Playlist | null>(null);
@@ -89,10 +89,53 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
   const [isLyricsOpen, setIsLyricsOpen] = useState<boolean>(false);
   const [isQueueOpen, setIsQueueOpen] = useState<boolean>(false);
   const [isVideoMode, setIsVideoMode] = useState<boolean>(false);
-  const [activeColor, setActiveColor] = useState<string>('#1e3264');
+  const [activeColor, setActiveColor] = useState<string>('#8400e7');
 
+  // Audio elements & refs
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   const ytPlayerRef = useRef<any>(null);
-  const progressTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Initialize native HTML5 Audio
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const audio = new Audio();
+      audio.preload = 'auto';
+      audioRef.current = audio;
+
+      audio.ontimeupdate = () => {
+        setCurrentTime(audio.currentTime);
+      };
+
+      audio.ondurationchange = () => {
+        if (audio.duration && !isNaN(audio.duration)) {
+          setDuration(audio.duration);
+        }
+      };
+
+      audio.onplay = () => setIsPlaying(true);
+      audio.onpause = () => setIsPlaying(false);
+
+      audio.onended = () => {
+        handleTrackEnded();
+      };
+
+      audio.onerror = (e) => {
+        console.warn('Audio stream error, attempting fallback:', e);
+      };
+
+      return () => {
+        audio.pause();
+        audio.src = '';
+      };
+    }
+  }, []);
+
+  // Sync volume to audio element
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = isMuted ? 0 : volume / 100;
+    }
+  }, [volume, isMuted]);
 
   // Load saved state from localStorage
   useEffect(() => {
@@ -110,14 +153,14 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  // Save likes to localStorage
+  // Save likes
   useEffect(() => {
     try {
       localStorage.setItem('aurafy_likes', JSON.stringify(likedTracks));
     } catch (e) {}
   }, [likedTracks]);
 
-  // Save playlists to localStorage
+  // Save playlists
   useEffect(() => {
     try {
       localStorage.setItem('aurafy_playlists', JSON.stringify(customPlaylists));
@@ -128,34 +171,36 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     ytPlayerRef.current = player;
   }, []);
 
-  // Sync progress
-  useEffect(() => {
-    if (isPlaying) {
-      progressTimerRef.current = setInterval(() => {
-        if (ytPlayerRef.current && typeof ytPlayerRef.current.getCurrentTime === 'function') {
-          const time = ytPlayerRef.current.getCurrentTime() || 0;
-          const dur = ytPlayerRef.current.getDuration() || 0;
-          setCurrentTime(time);
-          if (dur > 0) setDuration(dur);
-        }
-      }, 250);
-    } else {
-      if (progressTimerRef.current) clearInterval(progressTimerRef.current);
-    }
+  // MediaSession API setup for lock screen / background playback on mobile
+  const setupMediaSession = useCallback((track: Track) => {
+    if (typeof window !== 'undefined' && 'mediaSession' in navigator) {
+      navigator.mediaSession.metadata = new MediaMetadata({
+        title: track.title,
+        artist: track.artist,
+        album: track.album || 'AuraFy Music',
+        artwork: [
+          { src: track.thumbnail, sizes: '96x96', type: 'image/jpeg' },
+          { src: track.thumbnail, sizes: '256x256', type: 'image/jpeg' },
+          { src: track.thumbnail, sizes: '512x512', type: 'image/jpeg' },
+        ],
+      });
 
-    return () => {
-      if (progressTimerRef.current) clearInterval(progressTimerRef.current);
-    };
-  }, [isPlaying]);
+      navigator.mediaSession.setActionHandler('play', () => togglePlayPause());
+      navigator.mediaSession.setActionHandler('pause', () => togglePlayPause());
+      navigator.mediaSession.setActionHandler('previoustrack', () => prevTrack());
+      navigator.mediaSession.setActionHandler('nexttrack', () => nextTrack());
+      navigator.mediaSession.setActionHandler('seekto', (details) => {
+        if (details.seekTime !== undefined) seekTo(details.seekTime);
+      });
+    }
+  }, []);
 
   const playTrack = (track: Track, newQueue?: Track[]) => {
     setCurrentTrack(track);
-    setActiveColor(track.accentColor || '#1e3264');
+    setActiveColor(track.accentColor || '#8400e7');
     setCurrentTime(0);
-    setIsPlaying(true);
 
     if (newQueue) {
-      // Set remaining tracks as upcoming queue
       const trackIndex = newQueue.findIndex((t) => t.id === track.id);
       if (trackIndex !== -1) {
         setQueue(newQueue.slice(trackIndex + 1));
@@ -164,12 +209,31 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
       }
     }
 
-    if (ytPlayerRef.current) {
-      if (typeof ytPlayerRef.current.loadVideoById === 'function') {
-        ytPlayerRef.current.loadVideoById(track.id);
-        ytPlayerRef.current.playVideo();
-      }
+    // Play native audio stream
+    if (audioRef.current && track.audioUrl) {
+      audioRef.current.src = track.audioUrl;
+      audioRef.current.currentTime = 0;
+      audioRef.current
+        .play()
+        .then(() => {
+          setIsPlaying(true);
+          setupMediaSession(track);
+        })
+        .catch((err) => {
+          console.warn('Playback error:', err);
+          // If native audio blocked or no audioUrl, try YouTube player
+          if (ytPlayerRef.current && track.youtubeId) {
+            ytPlayerRef.current.loadVideoById(track.youtubeId);
+            ytPlayerRef.current.playVideo();
+          }
+        });
+    } else if (ytPlayerRef.current && track.youtubeId) {
+      ytPlayerRef.current.loadVideoById(track.youtubeId);
+      ytPlayerRef.current.playVideo();
+      setIsPlaying(true);
     }
+
+    setupMediaSession(track);
   };
 
   const togglePlayPause = () => {
@@ -178,7 +242,14 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
       return;
     }
 
-    if (ytPlayerRef.current) {
+    if (audioRef.current && currentTrack?.audioUrl) {
+      if (isPlaying) {
+        audioRef.current.pause();
+        setIsPlaying(false);
+      } else {
+        audioRef.current.play().then(() => setIsPlaying(true)).catch(() => {});
+      }
+    } else if (ytPlayerRef.current) {
       if (isPlaying) {
         ytPlayerRef.current.pauseVideo();
         setIsPlaying(false);
@@ -193,6 +264,9 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
 
   const seekTo = (seconds: number) => {
     setCurrentTime(seconds);
+    if (audioRef.current && currentTrack?.audioUrl) {
+      audioRef.current.currentTime = seconds;
+    }
     if (ytPlayerRef.current && typeof ytPlayerRef.current.seekTo === 'function') {
       ytPlayerRef.current.seekTo(seconds, true);
     }
@@ -202,11 +276,11 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     const clamped = Math.max(0, Math.min(100, val));
     setVolumeState(clamped);
     if (clamped > 0 && isMuted) setIsMuted(false);
+    if (audioRef.current) {
+      audioRef.current.volume = clamped / 100;
+    }
     if (ytPlayerRef.current && typeof ytPlayerRef.current.setVolume === 'function') {
       ytPlayerRef.current.setVolume(clamped);
-      if (clamped > 0 && typeof ytPlayerRef.current.unMute === 'function') {
-        ytPlayerRef.current.unMute();
-      }
     }
     try {
       localStorage.setItem('aurafy_volume', String(clamped));
@@ -216,20 +290,20 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
   const toggleMute = () => {
     if (isMuted) {
       setIsMuted(false);
+      if (audioRef.current) audioRef.current.muted = false;
       if (ytPlayerRef.current && typeof ytPlayerRef.current.unMute === 'function') {
         ytPlayerRef.current.unMute();
       }
     } else {
       setIsMuted(true);
+      if (audioRef.current) audioRef.current.muted = true;
       if (ytPlayerRef.current && typeof ytPlayerRef.current.mute === 'function') {
         ytPlayerRef.current.mute();
       }
     }
   };
 
-  const toggleShuffle = () => {
-    setIsShuffle(!isShuffle);
-  };
+  const toggleShuffle = () => setIsShuffle(!isShuffle);
 
   const toggleRepeat = () => {
     if (repeatMode === 'off') setRepeatMode('all');
@@ -237,10 +311,10 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     else setRepeatMode('off');
   };
 
-  const nextTrack = useCallback(() => {
+  const handleTrackEnded = () => {
     if (repeatMode === 'one' && currentTrack) {
       seekTo(0);
-      if (ytPlayerRef.current) ytPlayerRef.current.playVideo();
+      if (audioRef.current) audioRef.current.play();
       return;
     }
 
@@ -251,15 +325,14 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
       }
       const next = queue[nextIndex];
       const remaining = queue.filter((_, idx) => idx !== nextIndex);
-      
+
       if (currentTrack) {
         setHistory((prev) => [currentTrack, ...prev.slice(0, 30)]);
       }
-      
+
       setQueue(remaining);
       playTrack(next);
     } else if (repeatMode === 'all' && history.length > 0) {
-      // Loop around to history
       const all = [...history].reverse();
       const first = all[0];
       setQueue(all.slice(1));
@@ -268,6 +341,10 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     } else {
       setIsPlaying(false);
     }
+  };
+
+  const nextTrack = useCallback(() => {
+    handleTrackEnded();
   }, [queue, history, isShuffle, repeatMode, currentTrack]);
 
   const prevTrack = () => {
@@ -288,19 +365,10 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const addToQueue = (track: Track) => {
-    setQueue((prev) => [...prev, track]);
-  };
+  const addToQueue = (track: Track) => setQueue((prev) => [...prev, track]);
+  const removeFromQueue = (index: number) => setQueue((prev) => prev.filter((_, i) => i !== index));
+  const clearQueue = () => setQueue([]);
 
-  const removeFromQueue = (index: number) => {
-    setQueue((prev) => prev.filter((_, i) => i !== index));
-  };
-
-  const clearQueue = () => {
-    setQueue([]);
-  };
-
-  // Likes & Library
   const isLiked = (trackId: string) => likedTracks.some((t) => t.id === trackId);
 
   const toggleLike = (track: Track) => {
@@ -308,12 +376,11 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
       setLikedTracks((prev) => prev.filter((t) => t.id !== track.id));
     } else {
       setLikedTracks((prev) => [track, ...prev]);
-      // Small celebratory confetti burst
       try {
         confetti({
-          particleCount: 30,
-          spread: 60,
-          origin: { y: 0.9, x: 0.1 },
+          particleCount: 25,
+          spread: 50,
+          origin: { y: 0.85, x: 0.5 },
           colors: ['#1DB954', '#1ed760', '#ffffff'],
         });
       } catch (e) {}
@@ -324,9 +391,9 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     const newPlaylist: Playlist = {
       id: `playlist-${Date.now()}`,
       title,
-      description: description || 'Created with AuraFy',
+      description: description || 'Created with AuraFy Glass',
       coverUrl: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=400&q=80',
-      accentColor: '#1e3264',
+      accentColor: '#8400e7',
       tracks: [],
       isCustom: true,
       createdAt: new Date().toLocaleDateString(),

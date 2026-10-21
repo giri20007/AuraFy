@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { usePlayer } from '@/context/PlayerContext';
-import { Playlist, Track } from '@/types/music';
+import { Playlist } from '@/types/music';
 import {
   Play,
   Pause,
@@ -39,7 +39,7 @@ export default function PlaylistDetailView({ playlist }: PlaylistDetailViewProps
   const totalMinutes = Math.floor(totalSeconds / 60);
 
   return (
-    <div className="space-y-6 pb-32 md:pb-16 select-none">
+    <div className="space-y-6 pb-36 md:pb-16 select-none">
       {/* Mobile Back Button */}
       <div className="md:hidden flex items-center pt-1">
         <button
@@ -47,22 +47,23 @@ export default function PlaylistDetailView({ playlist }: PlaylistDetailViewProps
             setSelectedPlaylist(null);
             setActiveView('home');
           }}
-          className="p-2 -ml-2 text-white/80 hover:text-white flex items-center gap-1 text-sm font-semibold"
+          className="glass-pill px-3 py-1.5 rounded-full text-white/90 hover:text-white flex items-center gap-1.5 text-xs font-bold"
         >
-          <ChevronLeft className="w-5 h-5" />
+          <ChevronLeft className="w-4 h-4" />
           <span>Back</span>
         </button>
       </div>
 
-      {/* Hero Header with Dynamic Gradient */}
+      {/* Hero Header with Dynamic Glass Gradient */}
       <div
-        className="relative -mx-3 sm:-mx-6 -mt-4 sm:-mt-16 px-4 sm:px-6 pt-6 sm:pt-20 pb-6 sm:pb-8 flex flex-col md:flex-row items-center md:items-end gap-5 sm:gap-6 shadow-2xl transition-colors duration-500 rounded-b-2xl md:rounded-none"
+        className="relative -mx-3 sm:-mx-6 -mt-3 sm:-mt-16 px-4 sm:px-8 pt-6 sm:pt-20 pb-6 sm:pb-8 flex flex-col md:flex-row items-center md:items-end gap-5 sm:gap-6 shadow-2xl transition-colors duration-500 rounded-3xl md:rounded-none overflow-hidden border border-white/10"
         style={{
-          background: `linear-gradient(180deg, ${playlist.accentColor} 0%, #121212 100%)`,
+          background: `linear-gradient(180deg, ${playlist.accentColor}66 0%, rgba(18,18,20,0.85) 100%)`,
+          backdropFilter: 'blur(30px)',
         }}
       >
         {/* Cover Art */}
-        <div className="relative group shrink-0 w-36 h-36 sm:w-48 sm:h-48 md:w-56 md:h-56 rounded-xl overflow-hidden shadow-2xl">
+        <div className="relative group shrink-0 w-36 h-36 sm:w-48 sm:h-48 md:w-56 md:h-56 rounded-2xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.6)] border border-white/15">
           <img
             src={playlist.coverUrl}
             alt={playlist.title}
@@ -72,13 +73,13 @@ export default function PlaylistDetailView({ playlist }: PlaylistDetailViewProps
 
         {/* Text Details */}
         <div className="flex flex-col gap-1.5 sm:gap-2 text-white text-center md:text-left min-w-0">
-          <span className="text-[10px] sm:text-xs uppercase font-extrabold tracking-widest text-white/80">
-            {playlist.isCustom ? 'Custom Playlist' : 'Playlist'}
+          <span className="text-[10px] sm:text-xs uppercase font-extrabold tracking-widest text-white/70">
+            {playlist.isCustom ? 'Custom Playlist' : 'Curated Playlist'}
           </span>
           <h1 className="text-2xl sm:text-4xl md:text-5xl font-black tracking-tight line-clamp-2">
             {playlist.title}
           </h1>
-          <p className="text-xs sm:text-sm text-white/70 line-clamp-2 max-w-2xl">
+          <p className="text-xs sm:text-sm text-white/70 line-clamp-2 max-w-2xl font-medium">
             {playlist.description}
           </p>
 
@@ -106,7 +107,7 @@ export default function PlaylistDetailView({ playlist }: PlaylistDetailViewProps
             }
           }}
           disabled={playlist.tracks.length === 0}
-          className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-[#1DB954] hover:scale-105 active:scale-95 disabled:opacity-50 text-black flex items-center justify-center shadow-xl transition"
+          className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-[#1DB954] hover:scale-105 active:scale-95 disabled:opacity-50 text-black flex items-center justify-center shadow-lg shadow-[#1DB954]/40 transition"
           title={isPlaylistPlaying ? 'Pause' : 'Play'}
         >
           {isPlaylistPlaying ? (
@@ -121,7 +122,7 @@ export default function PlaylistDetailView({ playlist }: PlaylistDetailViewProps
       {playlist.tracks.length > 0 ? (
         <div className="w-full">
           {/* Desktop Table Header */}
-          <div className="hidden md:grid grid-cols-12 gap-4 px-4 py-2 border-b border-white/10 text-xs font-semibold text-[#b3b3b3] uppercase tracking-wider">
+          <div className="hidden md:grid grid-cols-12 gap-4 px-4 py-2 border-b border-white/10 text-xs font-semibold text-[#a1a1aa] uppercase tracking-wider">
             <div className="col-span-1 text-center">#</div>
             <div className="col-span-5">Title</div>
             <div className="col-span-3">Album / Artist</div>
@@ -130,7 +131,7 @@ export default function PlaylistDetailView({ playlist }: PlaylistDetailViewProps
             </div>
           </div>
 
-          {/* Track rows (Responsive for both mobile & desktop) */}
+          {/* Track rows */}
           <div className="mt-2 space-y-1">
             {playlist.tracks.map((track, index) => {
               const isCurrent = currentTrack?.id === track.id;
@@ -141,12 +142,12 @@ export default function PlaylistDetailView({ playlist }: PlaylistDetailViewProps
                 <div
                   key={`${track.id}-${index}`}
                   onClick={() => playTrack(track, playlist.tracks)}
-                  className={`group flex md:grid md:grid-cols-12 md:gap-4 px-2 sm:px-4 py-2.5 rounded-lg items-center justify-between cursor-pointer transition ${
-                    isCurrent ? 'bg-white/10' : 'hover:bg-white/5 active:bg-white/15'
+                  className={`group flex md:grid md:grid-cols-12 md:gap-4 px-2.5 sm:px-4 py-2.5 rounded-xl items-center justify-between cursor-pointer transition ${
+                    isCurrent ? 'bg-white/15' : 'hover:bg-white/5 active:bg-white/10'
                   }`}
                 >
                   {/* Desktop Index */}
-                  <div className="hidden md:block col-span-1 text-center text-sm font-medium text-[#b3b3b3]">
+                  <div className="hidden md:block col-span-1 text-center text-sm font-medium text-[#a1a1aa]">
                     <span className={`group-hover:hidden ${isCurrent ? 'text-[#1DB954]' : ''}`}>
                       {index + 1}
                     </span>
@@ -174,38 +175,36 @@ export default function PlaylistDetailView({ playlist }: PlaylistDetailViewProps
                     <img
                       src={track.thumbnail}
                       alt={track.title}
-                      className="w-11 h-11 md:w-10 md:h-10 rounded-md object-cover shrink-0"
+                      className="w-11 h-11 md:w-10 md:h-10 rounded-xl object-cover shrink-0 shadow border border-white/10"
                     />
                     <div className="min-w-0 flex-1">
                       <p
-                        className={`text-sm font-semibold truncate ${
+                        className={`text-sm font-bold truncate ${
                           isCurrent ? 'text-[#1DB954]' : 'text-white'
                         }`}
                       >
                         {track.title}
                       </p>
-                      <p className="text-xs text-[#b3b3b3] truncate mt-0.5">
+                      <p className="text-xs text-[#a1a1aa] truncate mt-0.5 font-medium">
                         {track.artist}
                       </p>
                     </div>
                   </div>
 
                   {/* Desktop Album */}
-                  <div className="hidden md:block col-span-3 text-xs text-[#b3b3b3] truncate">
+                  <div className="hidden md:block col-span-3 text-xs text-[#a1a1aa] truncate">
                     {track.album || track.artist}
                   </div>
 
                   {/* Actions & Duration */}
-                  <div className="md:col-span-3 flex items-center justify-end gap-3 text-xs text-[#b3b3b3] font-mono shrink-0">
+                  <div className="md:col-span-3 flex items-center justify-end gap-3 text-xs text-[#a1a1aa] font-mono shrink-0">
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
                         toggleLike(track);
                       }}
                       className={`p-1.5 transition ${
-                        liked
-                          ? 'text-[#1DB954]'
-                          : 'text-[#b3b3b3] hover:text-white'
+                        liked ? 'text-[#1DB954]' : 'text-white/40 hover:text-white'
                       }`}
                       title={liked ? 'Unlike' : 'Like'}
                     >
@@ -217,7 +216,7 @@ export default function PlaylistDetailView({ playlist }: PlaylistDetailViewProps
                         e.stopPropagation();
                         addToQueue(track);
                       }}
-                      className="hidden sm:block p-1 text-[#b3b3b3] hover:text-white transition"
+                      className="hidden sm:block p-1 text-[#a1a1aa] hover:text-white transition"
                       title="Add to queue"
                     >
                       <Plus className="w-4 h-4" />
