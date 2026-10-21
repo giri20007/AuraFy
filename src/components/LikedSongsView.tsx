@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { usePlayer } from '@/context/PlayerContext';
-import { Play, Pause, Heart, Clock, Plus, Trash2 } from 'lucide-react';
+import { Play, Pause, Heart, Clock, Plus, ChevronLeft } from 'lucide-react';
 
 export default function LikedSongsView() {
   const {
@@ -13,6 +13,8 @@ export default function LikedSongsView() {
     togglePlayPause,
     toggleLike,
     addToQueue,
+    setActiveView,
+    setSelectedPlaylist,
   } = usePlayer();
 
   const isLikedPlaying =
@@ -22,34 +24,48 @@ export default function LikedSongsView() {
   const totalMinutes = Math.floor(totalSeconds / 60);
 
   return (
-    <div className="space-y-6 pb-16">
+    <div className="space-y-6 pb-32 md:pb-16 select-none">
+      {/* Mobile Back Button */}
+      <div className="md:hidden flex items-center pt-1">
+        <button
+          onClick={() => {
+            setSelectedPlaylist(null);
+            setActiveView('library');
+          }}
+          className="p-2 -ml-2 text-white/80 hover:text-white flex items-center gap-1 text-sm font-semibold"
+        >
+          <ChevronLeft className="w-5 h-5" />
+          <span>Back</span>
+        </button>
+      </div>
+
       {/* Signature Liked Songs Hero Header */}
-      <div className="relative -mx-6 -mt-16 px-6 pt-20 pb-8 flex flex-col md:flex-row items-start md:items-end gap-6 shadow-2xl bg-gradient-to-b from-[#450af5] to-[#121212] transition-colors duration-500">
+      <div className="relative -mx-3 sm:-mx-6 -mt-4 sm:-mt-16 px-4 sm:px-6 pt-6 sm:pt-20 pb-6 sm:pb-8 flex flex-col md:flex-row items-center md:items-end gap-5 sm:gap-6 shadow-2xl bg-gradient-to-b from-[#450af5] to-[#121212] transition-colors duration-500 rounded-b-2xl md:rounded-none">
         {/* Cover Art */}
-        <div className="w-48 h-48 md:w-56 md:h-56 rounded-lg bg-gradient-to-br from-[#450af5] via-[#6520f5] to-[#8e8ee5] flex items-center justify-center shrink-0 shadow-2xl">
-          <Heart className="w-24 h-24 text-white fill-white drop-shadow-md" />
+        <div className="w-36 h-36 sm:w-48 sm:h-48 md:w-56 md:h-56 rounded-xl bg-gradient-to-br from-[#450af5] via-[#6520f5] to-[#8e8ee5] flex items-center justify-center shrink-0 shadow-2xl">
+          <Heart className="w-16 h-16 sm:w-24 sm:h-24 text-white fill-white drop-shadow-md" />
         </div>
 
         {/* Text Details */}
-        <div className="flex flex-col gap-2 text-white">
-          <span className="text-xs uppercase font-extrabold tracking-widest text-white/80">
+        <div className="flex flex-col gap-1.5 sm:gap-2 text-white text-center md:text-left min-w-0">
+          <span className="text-[10px] sm:text-xs uppercase font-extrabold tracking-widest text-white/80">
             Playlist
           </span>
-          <h1 className="text-4xl md:text-6xl font-black tracking-tight">
+          <h1 className="text-2xl sm:text-4xl md:text-5xl font-black tracking-tight">
             Liked Songs
           </h1>
-          <p className="text-sm text-white/70">
+          <p className="text-xs sm:text-sm text-white/70">
             Your personal collection of saved favorite tracks.
           </p>
 
-          <div className="flex items-center gap-2 text-xs font-semibold text-white/90 mt-2">
+          <div className="flex items-center justify-center md:justify-start gap-2 text-xs font-semibold text-white/90 mt-1">
             <span className="text-white font-bold">giri20007</span>
             <span>•</span>
             <span>{likedTracks.length} songs</span>
             {likedTracks.length > 0 && (
               <>
                 <span>•</span>
-                <span className="text-white/70">about {totalMinutes} min</span>
+                <span className="text-white/70">{totalMinutes} min</span>
               </>
             )}
           </div>
@@ -58,7 +74,7 @@ export default function LikedSongsView() {
 
       {/* Action Controls Bar */}
       {likedTracks.length > 0 && (
-        <div className="flex items-center gap-6 py-2">
+        <div className="flex items-center justify-between py-1">
           <button
             onClick={() => {
               if (isLikedPlaying) {
@@ -67,13 +83,13 @@ export default function LikedSongsView() {
                 playTrack(likedTracks[0], likedTracks);
               }
             }}
-            className="w-14 h-14 rounded-full bg-[#1DB954] hover:scale-105 active:scale-95 text-black flex items-center justify-center shadow-xl transition"
+            className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-[#1DB954] hover:scale-105 active:scale-95 text-black flex items-center justify-center shadow-xl transition"
             title={isLikedPlaying ? 'Pause' : 'Play All'}
           >
             {isLikedPlaying ? (
-              <Pause className="w-7 h-7 fill-black" />
+              <Pause className="w-6 h-6 sm:w-7 sm:h-7 fill-black" />
             ) : (
-              <Play className="w-7 h-7 fill-black ml-1" />
+              <Play className="w-6 h-6 sm:w-7 sm:h-7 fill-black ml-0.5" />
             )}
           </button>
         </div>
@@ -82,17 +98,17 @@ export default function LikedSongsView() {
       {/* Tracklist Table */}
       {likedTracks.length > 0 ? (
         <div className="w-full">
-          {/* Table Header */}
-          <div className="grid grid-cols-12 gap-4 px-4 py-2 border-b border-white/10 text-xs font-semibold text-[#b3b3b3] uppercase tracking-wider">
+          {/* Desktop Table Header */}
+          <div className="hidden md:grid grid-cols-12 gap-4 px-4 py-2 border-b border-white/10 text-xs font-semibold text-[#b3b3b3] uppercase tracking-wider">
             <div className="col-span-1 text-center">#</div>
-            <div className="col-span-6 md:col-span-5">Title</div>
-            <div className="col-span-3 hidden md:block">Artist / Channel</div>
-            <div className="col-span-5 md:col-span-3 flex items-center justify-end gap-2 pr-2">
+            <div className="col-span-5">Title</div>
+            <div className="col-span-3">Artist / Channel</div>
+            <div className="col-span-3 flex items-center justify-end gap-2 pr-2">
               <Clock className="w-4 h-4" />
             </div>
           </div>
 
-          {/* Table Rows */}
+          {/* Track Rows */}
           <div className="mt-2 space-y-1">
             {likedTracks.map((track, index) => {
               const isCurrent = currentTrack?.id === track.id;
@@ -102,12 +118,12 @@ export default function LikedSongsView() {
                 <div
                   key={track.id}
                   onClick={() => playTrack(track, likedTracks)}
-                  className={`group grid grid-cols-12 gap-4 px-4 py-2.5 rounded-lg items-center cursor-pointer transition ${
-                    isCurrent ? 'bg-white/10' : 'hover:bg-white/5'
+                  className={`group flex md:grid md:grid-cols-12 md:gap-4 px-2 sm:px-4 py-2.5 rounded-lg items-center justify-between cursor-pointer transition ${
+                    isCurrent ? 'bg-white/10' : 'hover:bg-white/5 active:bg-white/15'
                   }`}
                 >
-                  {/* Column 1: Index / Play Icon */}
-                  <div className="col-span-1 text-center text-sm font-medium text-[#b3b3b3]">
+                  {/* Desktop Index */}
+                  <div className="hidden md:block col-span-1 text-center text-sm font-medium text-[#b3b3b3]">
                     <span className={`group-hover:hidden ${isCurrent ? 'text-[#1DB954]' : ''}`}>
                       {index + 1}
                     </span>
@@ -130,14 +146,14 @@ export default function LikedSongsView() {
                     </button>
                   </div>
 
-                  {/* Column 2: Track Art & Title */}
-                  <div className="col-span-6 md:col-span-5 flex items-center gap-3 min-w-0">
+                  {/* Thumbnail & Title */}
+                  <div className="md:col-span-5 flex items-center gap-3 min-w-0 flex-1 pr-2">
                     <img
                       src={track.thumbnail}
                       alt={track.title}
-                      className="w-10 h-10 rounded object-cover shrink-0"
+                      className="w-11 h-11 md:w-10 md:h-10 rounded-md object-cover shrink-0"
                     />
-                    <div className="min-w-0 pr-2">
+                    <div className="min-w-0 flex-1">
                       <p
                         className={`text-sm font-semibold truncate ${
                           isCurrent ? 'text-[#1DB954]' : 'text-white'
@@ -145,25 +161,25 @@ export default function LikedSongsView() {
                       >
                         {track.title}
                       </p>
-                      <p className="text-xs text-[#b3b3b3] truncate">
+                      <p className="text-xs text-[#b3b3b3] truncate mt-0.5">
                         {track.artist}
                       </p>
                     </div>
                   </div>
 
-                  {/* Column 3: Artist */}
-                  <div className="col-span-3 hidden md:block text-xs text-[#b3b3b3] truncate">
+                  {/* Desktop Artist */}
+                  <div className="hidden md:block col-span-3 text-xs text-[#b3b3b3] truncate">
                     {track.artist}
                   </div>
 
-                  {/* Column 4: Actions & Duration */}
-                  <div className="col-span-5 md:col-span-3 flex items-center justify-end gap-3 text-xs text-[#b3b3b3] font-mono">
+                  {/* Actions & Duration */}
+                  <div className="md:col-span-3 flex items-center justify-end gap-3 text-xs text-[#b3b3b3] font-mono shrink-0">
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
                         toggleLike(track);
                       }}
-                      className="p-1 text-[#1DB954] hover:scale-110 transition"
+                      className="p-1.5 text-[#1DB954] hover:scale-110 transition"
                       title="Remove from Liked Songs"
                     >
                       <Heart className="w-4 h-4 fill-[#1DB954]" />
@@ -174,7 +190,7 @@ export default function LikedSongsView() {
                         e.stopPropagation();
                         addToQueue(track);
                       }}
-                      className="p-1 opacity-0 group-hover:opacity-100 text-[#b3b3b3] hover:text-white transition"
+                      className="hidden sm:block p-1 text-[#b3b3b3] hover:text-white transition"
                       title="Add to queue"
                     >
                       <Plus className="w-4 h-4" />
@@ -190,8 +206,8 @@ export default function LikedSongsView() {
       ) : (
         <div className="text-center py-20 text-white/40 space-y-3">
           <Heart className="w-12 h-12 mx-auto text-white/20" />
-          <p className="text-lg font-semibold text-white/70">Songs you like will appear here</p>
-          <p className="text-sm">Save songs by tapping the heart icon on any track.</p>
+          <p className="text-base font-semibold text-white/70">Songs you like will appear here</p>
+          <p className="text-xs">Tap the heart on any song to save it.</p>
         </div>
       )}
     </div>

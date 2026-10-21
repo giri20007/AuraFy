@@ -44,7 +44,7 @@ export default function Sidebar({ onOpenCreateModal }: SidebarProps) {
   });
 
   return (
-    <aside className="w-64 md:w-72 bg-black flex flex-col h-full gap-2 p-2 select-none shrink-0">
+    <aside className="hidden md:flex w-64 md:w-72 bg-black flex-col h-full gap-2 p-2 select-none shrink-0">
       {/* Brand & Main Navigation Block */}
       <div className="bg-[#121212] rounded-xl p-4 flex flex-col gap-3">
         {/* Brand */}

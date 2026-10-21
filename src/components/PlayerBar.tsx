@@ -76,7 +76,7 @@ export default function PlayerBar() {
   };
 
   return (
-    <footer className="h-20 sm:h-24 bg-black border-t border-white/10 px-4 flex items-center justify-between select-none z-50">
+    <footer className="hidden md:flex h-20 sm:h-24 bg-black border-t border-white/10 px-4 items-center justify-between select-none z-50">
       {/* LEFT: Currently Playing Track Info */}
       <div className="flex items-center gap-3 w-1/4 min-w-[180px] max-w-[320px]">
         {currentTrack ? (

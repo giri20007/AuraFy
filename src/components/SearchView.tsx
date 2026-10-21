@@ -52,7 +52,7 @@ export default function SearchView() {
   const remainingResults = searchResults.slice(5);
 
   return (
-    <div className="space-y-8 pb-16">
+    <div className="space-y-6 sm:space-y-8 pb-32 md:pb-16 select-none">
       {/* Search Input Indicator (if user is just browsing) */}
       {!searchQuery && (
         <section className="space-y-4">

@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { usePlayer } from '@/context/PlayerContext';
 import { CURATED_PLAYLISTS } from '@/data/curatedPlaylists';
 import { Track, Playlist } from '@/types/music';
-import { Play, Pause, Heart, Sparkles } from 'lucide-react';
+import { Play, Pause, Heart } from 'lucide-react';
 
 export default function HomeView() {
   const {
@@ -56,16 +56,16 @@ export default function HomeView() {
   ];
 
   return (
-    <div className="space-y-8 pb-12">
+    <div className="space-y-6 sm:space-y-8 pb-32 md:pb-16 select-none">
       {/* Greeting Header */}
-      <div>
-        <h1 className="text-3xl font-black text-white tracking-tight">
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
           {greeting}
         </h1>
       </div>
 
-      {/* Quick Access 6-Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+      {/* Quick Access 6-Grid (2 cols on mobile, 3 cols on desktop) */}
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3">
         {quickAccessItems.map((item) => {
           const isItemPlaying =
             item.tracks.some((t) => t.id === currentTrack?.id) && isPlaying;
@@ -81,26 +81,26 @@ export default function HomeView() {
                   setActiveView('playlist');
                 }
               }}
-              className="group flex items-center justify-between bg-white/5 hover:bg-white/10 rounded-md overflow-hidden cursor-pointer transition duration-300 relative"
+              className="group flex items-center justify-between bg-white/5 hover:bg-white/10 rounded-md overflow-hidden cursor-pointer transition duration-200 relative h-14 sm:h-16"
             >
-              <div className="flex items-center gap-3 min-w-0">
+              <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
                 {item.isLikedTile ? (
-                  <div className="w-16 h-16 bg-gradient-to-br from-[#450af5] to-[#8e8ee5] flex items-center justify-center shrink-0">
-                    <Heart className="w-7 h-7 text-white fill-white" />
+                  <div className="w-14 sm:w-16 h-14 sm:h-16 bg-gradient-to-br from-[#450af5] to-[#8e8ee5] flex items-center justify-center shrink-0">
+                    <Heart className="w-6 sm:w-7 h-6 sm:h-7 text-white fill-white" />
                   </div>
                 ) : (
                   <img
                     src={item.cover}
                     alt={item.title}
-                    className="w-16 h-16 object-cover shrink-0"
+                    className="w-14 sm:w-16 h-14 sm:h-16 object-cover shrink-0"
                   />
                 )}
-                <span className="font-bold text-sm text-white truncate pr-2">
+                <span className="font-bold text-xs sm:text-sm text-white truncate pr-2">
                   {item.title}
                 </span>
               </div>
 
-              {/* Hover play button */}
+              {/* Hover play button on desktop */}
               <button
                 onClick={(e) => {
                   e.stopPropagation();
@@ -112,7 +112,7 @@ export default function HomeView() {
                     }
                   }
                 }}
-                className={`mr-4 w-11 h-11 rounded-full bg-[#1DB954] hover:scale-105 active:scale-95 text-black flex items-center justify-center shadow-xl transition-all duration-300 ${
+                className={`hidden sm:flex mr-3 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#1DB954] hover:scale-105 active:scale-95 text-black items-center justify-center shadow-xl transition-all duration-300 ${
                   isItemPlaying
                     ? 'opacity-100 translate-y-0 scale-100'
                     : 'opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0'
@@ -120,9 +120,9 @@ export default function HomeView() {
                 title={isItemPlaying ? 'Pause' : 'Play'}
               >
                 {isItemPlaying ? (
-                  <Pause className="w-5 h-5 fill-black" />
+                  <Pause className="w-4 h-4 fill-black" />
                 ) : (
-                  <Play className="w-5 h-5 fill-black ml-0.5" />
+                  <Play className="w-4 h-4 fill-black ml-0.5" />
                 )}
               </button>
             </div>
@@ -130,9 +130,9 @@ export default function HomeView() {
         })}
       </div>
 
-      {/* Curated Playlist Shelves */}
+      {/* Curated Playlist Shelves (Horizontal scroll on mobile, Grid on desktop) */}
       {CURATED_PLAYLISTS.map((playlist) => (
-        <section key={playlist.id} className="space-y-4">
+        <section key={playlist.id} className="space-y-3">
           <div className="flex items-end justify-between">
             <div>
               <h2
@@ -140,11 +140,11 @@ export default function HomeView() {
                   setSelectedPlaylist(playlist);
                   setActiveView('playlist');
                 }}
-                className="text-2xl font-bold text-white hover:underline cursor-pointer"
+                className="text-lg sm:text-2xl font-bold text-white hover:underline cursor-pointer tracking-tight"
               >
                 {playlist.title}
               </h2>
-              <p className="text-xs text-[#b3b3b3] mt-1 line-clamp-1">
+              <p className="text-xs text-[#b3b3b3] mt-0.5 line-clamp-1 hidden sm:block">
                 {playlist.description}
               </p>
             </div>
@@ -153,14 +153,14 @@ export default function HomeView() {
                 setSelectedPlaylist(playlist);
                 setActiveView('playlist');
               }}
-              className="text-xs font-bold text-[#b3b3b3] hover:underline uppercase tracking-wider"
+              className="text-xs font-bold text-[#b3b3b3] hover:underline uppercase tracking-wider shrink-0"
             >
               Show all
             </button>
           </div>
 
-          {/* Cards Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+          {/* Cards: Horizontal scroll on phone, Grid on desktop */}
+          <div className="flex md:grid md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4 overflow-x-auto no-scrollbar pb-2 -mx-4 px-4 md:mx-0 md:px-0">
             {playlist.tracks.map((track) => {
               const isCurrent = currentTrack?.id === track.id;
               const isTrackPlaying = isCurrent && isPlaying;
@@ -170,10 +170,10 @@ export default function HomeView() {
                 <div
                   key={track.id}
                   onClick={() => playTrack(track, playlist.tracks)}
-                  className="group bg-[#181818] hover:bg-[#282828] p-3.5 rounded-lg cursor-pointer transition-all duration-300 flex flex-col relative"
+                  className="group w-36 shrink-0 md:w-auto bg-[#181818] hover:bg-[#282828] p-3 rounded-lg cursor-pointer transition-all duration-200 flex flex-col relative"
                 >
                   {/* Thumbnail & Floating Play Button */}
-                  <div className="relative aspect-square w-full rounded-md overflow-hidden mb-3 bg-[#282828]">
+                  <div className="relative aspect-square w-full rounded-md overflow-hidden mb-2.5 bg-[#282828]">
                     <img
                       src={track.thumbnail}
                       alt={track.title}
@@ -190,7 +190,7 @@ export default function HomeView() {
                           playTrack(track, playlist.tracks);
                         }
                       }}
-                      className={`absolute bottom-2 right-2 w-10 h-10 rounded-full bg-[#1DB954] hover:scale-105 active:scale-95 text-black flex items-center justify-center shadow-2xl transition-all duration-300 ${
+                      className={`absolute bottom-2 right-2 w-9 h-9 rounded-full bg-[#1DB954] hover:scale-105 active:scale-95 text-black flex items-center justify-center shadow-2xl transition-all duration-300 ${
                         isTrackPlaying
                           ? 'opacity-100 translate-y-0'
                           : 'opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0'
@@ -198,32 +198,32 @@ export default function HomeView() {
                       title={isTrackPlaying ? 'Pause' : 'Play'}
                     >
                       {isTrackPlaying ? (
-                        <Pause className="w-5 h-5 fill-black" />
+                        <Pause className="w-4 h-4 fill-black" />
                       ) : (
-                        <Play className="w-5 h-5 fill-black ml-0.5" />
+                        <Play className="w-4 h-4 fill-black ml-0.5" />
                       )}
                     </button>
                   </div>
 
                   {/* Track Info */}
                   <h3
-                    className={`font-bold text-sm truncate ${
+                    className={`font-bold text-xs sm:text-sm truncate ${
                       isCurrent ? 'text-[#1DB954]' : 'text-white'
                     }`}
                   >
                     {track.title}
                   </h3>
-                  <p className="text-xs text-[#b3b3b3] truncate mt-1">
+                  <p className="text-[11px] sm:text-xs text-[#b3b3b3] truncate mt-0.5">
                     {track.artist}
                   </p>
 
-                  {/* Like button on hover */}
+                  {/* Like button */}
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
                       toggleLike(track);
                     }}
-                    className={`absolute top-5 right-5 p-1.5 rounded-full bg-black/60 backdrop-blur-sm transition ${
+                    className={`absolute top-4 right-4 p-1.5 rounded-full bg-black/60 backdrop-blur-sm transition ${
                       liked
                         ? 'opacity-100 text-[#1DB954]'
                         : 'opacity-0 group-hover:opacity-100 text-white/70 hover:text-white'
