@@ -1,4 +1,116 @@
-import { Playlist } from '@/types/music';
+import { Playlist, Track } from '@/types/music';
+
+export interface ArtistItem {
+  id: string;
+  name: string;
+  image: string;
+  topTrack: Track;
+}
+
+export const TOP_ARTISTS: ArtistItem[] = [
+  {
+    id: 'the-weeknd',
+    name: 'The Weeknd',
+    image: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=400&auto=format&fit=crop&q=80',
+    topTrack: {
+      id: '1542842761',
+      title: 'Blinding Lights',
+      artist: 'The Weeknd',
+      album: 'After Hours',
+      thumbnail: 'https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/61/e7/3f/61e73f94-018d-5f50-50ec-8521952bc72e/20UM1IM11629.rgb.jpg/600x600bb.jpg',
+      audioUrl: 'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/12/73/ca/1273ca46-233a-5331-189b-25ac1d656533/mzaf_976341070785891411.plus.aac.p.m4a',
+      youtubeId: '4NRXx6U8ABQ',
+      duration: '3:36',
+      durationSeconds: 216,
+      accentColor: '#e91429',
+    },
+  },
+  {
+    id: 'sabrina-carpenter',
+    name: 'Sabrina Carpenter',
+    image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&auto=format&fit=crop&q=80',
+    topTrack: {
+      id: '1746801012',
+      title: 'Espresso',
+      artist: 'Sabrina Carpenter',
+      album: 'Espresso EP',
+      thumbnail: 'https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/57/e8/7b/57e87ba0-5057-9bb9-c247-ce7dbe426e89/24UMGIM55213.rgb.jpg/600x600bb.jpg',
+      audioUrl: 'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/e9/4d/02/e94d0230-11ee-ef94-d2cf-a5d547bd73f4/mzaf_554140808559155562.plus.aac.p.m4a',
+      youtubeId: 'eVli-tstM5E',
+      duration: '2:55',
+      durationSeconds: 175,
+      accentColor: '#bc5900',
+    },
+  },
+  {
+    id: 'harry-styles',
+    name: 'Harry Styles',
+    image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&auto=format&fit=crop&q=80',
+    topTrack: {
+      id: '1615585008',
+      title: 'As It Was',
+      artist: 'Harry Styles',
+      album: "Harry's House",
+      thumbnail: 'https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/2a/19/fb/2a19fb85-2f70-9e44-f2a9-82abe679b88e/886449990061.jpg/600x600bb.jpg',
+      audioUrl: 'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/67/10/16/67101606-3869-ca44-6c03-e13d6322cb51/mzaf_1135399237022217274.plus.aac.p.m4a',
+      youtubeId: 'H5v3k2nn9pc',
+      duration: '2:47',
+      durationSeconds: 167,
+      accentColor: '#0d72ec',
+    },
+  },
+  {
+    id: 'dua-lipa',
+    name: 'Dua Lipa',
+    image: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=400&auto=format&fit=crop&q=80',
+    topTrack: {
+      id: '1538003843',
+      title: 'Levitating',
+      artist: 'Dua Lipa',
+      album: 'Future Nostalgia',
+      thumbnail: 'https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/6c/11/d6/6c11d681-aa3a-d59e-4c2e-f77e181026ab/190295092665.jpg/600x600bb.jpg',
+      audioUrl: 'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/59/dc/4d/59dc4dda-93ff-8f1c-c536-f005f6ea6af5/mzaf_3066686759813252385.plus.aac.p.m4a',
+      youtubeId: 'TUVcZfQe-Kw',
+      duration: '3:23',
+      durationSeconds: 203,
+      accentColor: '#5038a0',
+    },
+  },
+  {
+    id: 'alan-walker',
+    name: 'Alan Walker',
+    image: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400&auto=format&fit=crop&q=80',
+    topTrack: {
+      id: '1196294581',
+      title: 'Faded',
+      artist: 'Alan Walker',
+      album: 'Faded - EP',
+      thumbnail: 'https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/0d/a3/1a/0da31af7-d0ff-9bee-c427-1b6d0336f6fc/886446321981.jpg/600x600bb.jpg',
+      audioUrl: 'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ab/18/d9/ab18d9e9-01f0-27ea-3a51-6e08585a0072/mzaf_14299744081264843911.plus.aac.p.m4a',
+      youtubeId: '60ItHLz5WEA',
+      duration: '3:32',
+      durationSeconds: 212,
+      accentColor: '#0d72ec',
+    },
+  },
+  {
+    id: 'coldplay',
+    name: 'Coldplay',
+    image: 'https://images.unsplash.com/photo-1498038432885-c6f3f1b912ee?w=400&auto=format&fit=crop&q=80',
+    topTrack: {
+      id: '3128096',
+      title: 'Yellow',
+      artist: 'Coldplay',
+      album: 'Parachutes',
+      thumbnail: 'https://cdn-images.dzcdn.net/images/cover/970dce98eeea6729244c0ae71707a83d/1000x1000-000000-80-0-0.jpg',
+      audioUrl: 'https://cdnt-preview.dzcdn.net/api/1/1/6/4/f/0/64f36083ad5a11e6803ef7ddbcdaf898.mp3',
+      youtubeId: 'yKNxeF4KMsY',
+      duration: '4:26',
+      durationSeconds: 266,
+      accentColor: '#8c1932',
+    },
+  },
+];
 
 export const CURATED_PLAYLISTS: Playlist[] = [
   {

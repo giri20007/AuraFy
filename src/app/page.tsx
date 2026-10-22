@@ -23,6 +23,7 @@ function MainAppShell() {
   const {
     activeView,
     selectedPlaylist,
+    activeColor,
   } = usePlayer();
 
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -37,26 +38,29 @@ function MainAppShell() {
   };
 
   return (
-    <div className="flex flex-col h-screen w-screen overflow-hidden text-white font-sans antialiased selection:bg-[#1DB954] selection:text-black relative">
-      {/* iOS 17 Dynamic Liquid Ambient Glow Background */}
+    <div className="flex flex-col h-screen w-screen overflow-hidden bg-black text-white font-sans antialiased selection:bg-[#1ed760] selection:text-black relative">
+      {/* Dynamic Ambient Background Glow */}
       <AmbientBackground />
 
-      {/* Top Body: Left Sidebar (Desktop) + Main Viewport (Full width on Mobile) */}
+      {/* Main Body: Sidebar + Main Content View */}
       <div className="flex-1 flex min-h-0 overflow-hidden relative">
-        {/* Left Sidebar (Desktop only) */}
+        {/* Desktop Sidebar (hidden on mobile) */}
         <Sidebar onOpenCreateModal={() => setIsCreateModalOpen(true)} />
 
-        {/* Center Main Viewport with iOS 17 Glass styling */}
+        {/* Center Main Viewport (Spotify #121212 surface with dynamic top gradient) */}
         <main
           ref={mainContentRef}
           onScroll={handleScroll}
-          className="flex-1 md:rounded-2xl glass-panel md:my-2 md:mr-2 overflow-y-auto relative flex flex-col w-full shadow-2xl"
+          className="flex-1 md:rounded-lg bg-[#121212] md:my-2 md:mr-2 overflow-y-auto relative flex flex-col w-full shadow-2xl transition-colors duration-500"
+          style={{
+            backgroundImage: `linear-gradient(180deg, ${activeColor || '#1e3264'}44 0%, rgba(18, 18, 18, 0.98) 320px, #121212 100%)`,
+          }}
         >
           {/* Sticky Top Navigation */}
           <TopNav scrolled={scrolled} />
 
           {/* Dynamic Content Views */}
-          <div className="flex-1 px-3 sm:px-6 pt-2 sm:pt-4">
+          <div className="flex-1 px-4 sm:px-6 pt-2">
             {activeView === 'home' && !selectedPlaylist && <HomeView />}
             {activeView === 'search' && !selectedPlaylist && <SearchView />}
             {activeView === 'liked' && !selectedPlaylist && <LikedSongsView />}
@@ -72,23 +76,23 @@ function MainAppShell() {
         {/* Queue Drawer */}
         <QueueDrawer />
 
-        {/* Synced Lyrics Fullscreen/Drawer */}
+        {/* Synced Lyrics Fullscreen Modal */}
         <LyricsModal />
       </div>
 
-      {/* YouTube Playback Engine (Optional Canvas/Video Mode) */}
+      {/* YouTube Playback Engine (Optional Video Mode) */}
       <YouTubeEngine />
 
-      {/* DESKTOP: Persistent Bottom Spotify Glass Player Bar */}
+      {/* DESKTOP: Persistent Bottom Spotify Player Bar */}
       <PlayerBar />
 
-      {/* MOBILE: Floating Glass Mini Player */}
+      {/* MOBILE: Floating Mini Player (right above bottom nav) */}
       <MobileMiniPlayer onOpenFullPlayer={() => setIsMobileFullPlayerOpen(true)} />
 
-      {/* MOBILE: Fixed Glass Bottom Dock (Home, Search, Library) */}
+      {/* MOBILE: Fixed Bottom Navigation Bar (Home, Search, Library) */}
       <MobileBottomNav />
 
-      {/* MOBILE: Expandable Full-Screen iOS 17 Now Playing Screen */}
+      {/* MOBILE: Expandable Full-Screen Now Playing Screen */}
       <MobileNowPlayingModal
         isOpen={isMobileFullPlayerOpen}
         onClose={() => setIsMobileFullPlayerOpen(false)}

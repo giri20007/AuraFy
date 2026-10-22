@@ -8,20 +8,22 @@ export default function MobileBottomNav() {
   const { activeView, setActiveView, setSelectedPlaylist } = usePlayer();
 
   return (
-    <nav className="md:hidden fixed bottom-2.5 inset-x-4 h-14 glass-dock rounded-full z-40 flex items-center justify-around px-2 select-none">
+    <nav className="md:hidden fixed bottom-0 inset-x-0 h-16 bg-[#121212]/95 backdrop-blur-xl border-t border-[#282828] z-40 flex items-center justify-around px-4 select-none pb-safe">
       <button
         onClick={() => {
           setSelectedPlaylist(null);
           setActiveView('home');
         }}
-        className={`flex items-center gap-1.5 px-4 py-2 rounded-full transition-all duration-200 ${
+        className={`flex flex-col items-center justify-center flex-1 py-1 gap-1 transition ${
           activeView === 'home'
-            ? 'bg-white/15 text-white font-bold shadow-inner'
-            : 'text-[#a1a1aa] hover:text-white'
+            ? 'text-white'
+            : 'text-[#b3b3b3] hover:text-white'
         }`}
       >
-        <Home className={`w-5 h-5 ${activeView === 'home' ? 'text-[#1DB954]' : ''}`} />
-        <span className="text-xs">Home</span>
+        <Home className={`w-5 h-5 ${activeView === 'home' ? 'text-white' : ''}`} />
+        <span className={`text-[11px] ${activeView === 'home' ? 'text-white font-bold' : 'font-medium'}`}>
+          Home
+        </span>
       </button>
 
       <button
@@ -29,14 +31,16 @@ export default function MobileBottomNav() {
           setSelectedPlaylist(null);
           setActiveView('search');
         }}
-        className={`flex items-center gap-1.5 px-4 py-2 rounded-full transition-all duration-200 ${
+        className={`flex flex-col items-center justify-center flex-1 py-1 gap-1 transition ${
           activeView === 'search'
-            ? 'bg-white/15 text-white font-bold shadow-inner'
-            : 'text-[#a1a1aa] hover:text-white'
+            ? 'text-white'
+            : 'text-[#b3b3b3] hover:text-white'
         }`}
       >
-        <Search className={`w-5 h-5 ${activeView === 'search' ? 'text-[#1DB954]' : ''}`} />
-        <span className="text-xs">Search</span>
+        <Search className={`w-5 h-5 ${activeView === 'search' ? 'text-white' : ''}`} />
+        <span className={`text-[11px] ${activeView === 'search' ? 'text-white font-bold' : 'font-medium'}`}>
+          Search
+        </span>
       </button>
 
       <button
@@ -44,14 +48,16 @@ export default function MobileBottomNav() {
           setSelectedPlaylist(null);
           setActiveView('library');
         }}
-        className={`flex items-center gap-1.5 px-4 py-2 rounded-full transition-all duration-200 ${
+        className={`flex flex-col items-center justify-center flex-1 py-1 gap-1 transition ${
           activeView === 'library' || activeView === 'liked'
-            ? 'bg-white/15 text-white font-bold shadow-inner'
-            : 'text-[#a1a1aa] hover:text-white'
+            ? 'text-white'
+            : 'text-[#b3b3b3] hover:text-white'
         }`}
       >
-        <Library className={`w-5 h-5 ${activeView === 'library' || activeView === 'liked' ? 'text-[#1DB954]' : ''}`} />
-        <span className="text-xs">Library</span>
+        <Library className={`w-5 h-5 ${activeView === 'library' || activeView === 'liked' ? 'text-white' : ''}`} />
+        <span className={`text-[11px] ${activeView === 'library' || activeView === 'liked' ? 'text-white font-bold' : 'font-medium'}`}>
+          Your Library
+        </span>
       </button>
     </nav>
   );

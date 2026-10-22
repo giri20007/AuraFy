@@ -16,6 +16,8 @@ import {
   Mic2,
   ListMusic,
   Tv,
+  MoreVertical,
+  Share2,
 } from 'lucide-react';
 
 interface MobileNowPlayingModalProps {
@@ -63,60 +65,45 @@ export default function MobileNowPlayingModal({
   };
 
   return (
-    <div className="md:hidden fixed inset-0 z-50 flex flex-col justify-between p-6 select-none animate-slide-up overflow-hidden backdrop-blur-3xl bg-[#09090b]/90">
-      {/* Dynamic Ambient Background Glow */}
-      <div
-        className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full blur-[120px] opacity-40 pointer-events-none transition-colors duration-1000"
-        style={{
-          backgroundColor: activeColor || '#8400e7',
-        }}
-      />
-
-      {/* Top Header Bar with iOS Grab Handle */}
-      <div className="relative z-10 flex flex-col items-center gap-2 pt-2">
-        {/* iOS Grab Handle */}
-        <div
+    <div
+      className="md:hidden fixed inset-0 z-50 flex flex-col justify-between p-6 select-none animate-slide-up overflow-hidden"
+      style={{
+        background: `linear-gradient(180deg, ${activeColor || '#1e3264'} 0%, #121212 55%, #000000 100%)`,
+      }}
+    >
+      {/* 1. Top Header Bar */}
+      <div className="flex items-center justify-between text-white pt-2">
+        <button
           onClick={onClose}
-          className="w-12 h-1.5 rounded-full bg-white/20 active:bg-white/40 cursor-pointer transition mb-1"
-        />
+          className="p-2 -ml-2 text-white/80 hover:text-white"
+          title="Close"
+        >
+          <ChevronDown className="w-7 h-7" />
+        </button>
 
-        <div className="w-full flex items-center justify-between text-white">
-          <button
-            onClick={onClose}
-            className="p-2 -ml-2 text-white/70 hover:text-white"
-            title="Collapse"
-          >
-            <ChevronDown className="w-7 h-7" />
-          </button>
-
-          <div className="text-center">
-            <p className="text-[10px] uppercase font-bold tracking-widest text-white/50">
-              Playing from
-            </p>
-            <p className="text-xs font-bold text-white truncate max-w-[200px]">
-              AuraFy Glass Stream
-            </p>
-          </div>
-
-          <button
-            onClick={() => setIsVideoMode(!isVideoMode)}
-            className={`p-2 -mr-2 rounded-full transition ${
-              isVideoMode ? 'text-[#1DB954]' : 'text-white/60 hover:text-white'
-            }`}
-            title="Video Mode"
-          >
-            <Tv className="w-5 h-5" />
-          </button>
+        <div className="text-center">
+          <p className="text-[10px] uppercase font-bold tracking-widest text-white/60">
+            Playing from playlist
+          </p>
+          <p className="text-xs font-bold text-white truncate max-w-[200px] mt-0.5">
+            Today&apos;s Top Hits
+          </p>
         </div>
+
+        <button
+          onClick={() => setIsVideoMode(!isVideoMode)}
+          className={`p-2 -mr-2 rounded-full transition ${
+            isVideoMode ? 'text-[#1ed760]' : 'text-white/70 hover:text-white'
+          }`}
+          title="Video Mode"
+        >
+          <Tv className="w-5 h-5" />
+        </button>
       </div>
 
-      {/* Center: Large Floating iOS 17 Artwork */}
-      <div className="relative z-10 my-auto px-4 py-4">
-        <div
-          className={`relative aspect-square w-full max-w-[320px] mx-auto rounded-3xl overflow-hidden shadow-[0_24px_60px_rgba(0,0,0,0.8)] border border-white/15 transition-transform duration-500 ${
-            isPlaying ? 'scale-100' : 'scale-95 opacity-90'
-          }`}
-        >
+      {/* 2. Middle: Large Square Cover Art (Real Spotify proportions) */}
+      <div className="my-auto px-4 py-2">
+        <div className="relative aspect-square w-full max-w-[320px] mx-auto rounded-lg overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.8)]">
           <img
             src={currentTrack.thumbnail}
             alt={currentTrack.title}
@@ -125,33 +112,33 @@ export default function MobileNowPlayingModal({
         </div>
       </div>
 
-      {/* Bottom Area: Controls, Slider, Actions */}
-      <div className="relative z-10 space-y-4 pb-2">
-        {/* Track Title, Artist, & Like Button */}
+      {/* 3. Bottom Controls Area */}
+      <div className="space-y-4 pb-2">
+        {/* Track Title, Artist, & Like */}
         <div className="flex items-center justify-between gap-4">
           <div className="min-w-0 flex-1">
-            <h2 className="text-2xl font-black text-white truncate tracking-tight">
+            <h2 className="text-xl sm:text-2xl font-black text-white truncate">
               {currentTrack.title}
             </h2>
-            <p className="text-sm text-[#a1a1aa] truncate mt-0.5 font-medium">
+            <p className="text-sm text-[#b3b3b3] truncate mt-0.5">
               {currentTrack.artist}
             </p>
           </div>
 
           <button
             onClick={() => toggleLike(currentTrack)}
-            className={`p-2 transition active:scale-90 ${
-              liked ? 'text-[#1DB954]' : 'text-white/60 hover:text-white'
+            className={`p-2 transition ${
+              liked ? 'text-[#1ed760]' : 'text-white/60 hover:text-white'
             }`}
           >
-            <Heart className={`w-7 h-7 ${liked ? 'fill-[#1DB954]' : ''}`} />
+            <Heart className={`w-7 h-7 ${liked ? 'fill-[#1ed760]' : ''}`} />
           </button>
         </div>
 
-        {/* iOS 17 Fluid Seek Bar */}
-        <div className="space-y-1.5">
+        {/* Seek Bar & Timestamps */}
+        <div className="space-y-1">
           <div className="relative flex items-center h-4 cursor-pointer">
-            <div className="w-full h-1.5 bg-white/15 rounded-full overflow-hidden">
+            <div className="w-full h-1 bg-[#4d4d4d] rounded-full overflow-hidden">
               <div
                 className="h-full bg-white rounded-full transition-all duration-100"
                 style={{ width: `${progressPercent}%` }}
@@ -168,7 +155,7 @@ export default function MobileNowPlayingModal({
             />
           </div>
 
-          <div className="flex justify-between text-xs text-[#a1a1aa] font-mono">
+          <div className="flex justify-between text-xs text-[#a7a7a7] font-mono">
             <span>{formatSecondsToTime(currentTime)}</span>
             <span>{duration > 0 ? formatSecondsToTime(duration) : currentTrack.duration}</span>
           </div>
@@ -179,7 +166,7 @@ export default function MobileNowPlayingModal({
           <button
             onClick={toggleShuffle}
             className={`p-2 transition ${
-              isShuffle ? 'text-[#1DB954]' : 'text-[#a1a1aa]'
+              isShuffle ? 'text-[#1ed760]' : 'text-[#b3b3b3]'
             }`}
           >
             <Shuffle className="w-5 h-5" />
@@ -187,11 +174,12 @@ export default function MobileNowPlayingModal({
 
           <button
             onClick={prevTrack}
-            className="p-2 text-white active:scale-90 transition"
+            className="p-2 text-white active:scale-95 transition"
           >
             <SkipBack className="w-8 h-8 fill-white" />
           </button>
 
+          {/* Large Circular Play/Pause Button */}
           <button
             onClick={togglePlayPause}
             className="w-16 h-16 rounded-full bg-white text-black flex items-center justify-center active:scale-90 transition shadow-2xl"
@@ -205,7 +193,7 @@ export default function MobileNowPlayingModal({
 
           <button
             onClick={nextTrack}
-            className="p-2 text-white active:scale-90 transition"
+            className="p-2 text-white active:scale-95 transition"
           >
             <SkipForward className="w-8 h-8 fill-white" />
           </button>
@@ -213,7 +201,7 @@ export default function MobileNowPlayingModal({
           <button
             onClick={toggleRepeat}
             className={`p-2 transition ${
-              repeatMode !== 'off' ? 'text-[#1DB954]' : 'text-[#a1a1aa]'
+              repeatMode !== 'off' ? 'text-[#1ed760]' : 'text-[#b3b3b3]'
             }`}
           >
             {repeatMode === 'one' ? (
@@ -224,16 +212,16 @@ export default function MobileNowPlayingModal({
           </button>
         </div>
 
-        {/* Bottom Glass Pills (Lyrics & Queue) */}
-        <div className="flex items-center justify-between pt-2 px-1 text-white/80">
+        {/* Bottom Lyrics & Queue Pills */}
+        <div className="flex items-center justify-between pt-2 px-2 text-white/70">
           <button
             onClick={() => {
               setIsLyricsOpen(true);
               onClose();
             }}
-            className="flex items-center gap-2 text-xs font-bold py-2 px-4 rounded-full glass-pill hover:bg-white/15 transition active:scale-95"
+            className="flex items-center gap-1.5 text-xs font-bold py-2 px-3.5 rounded-full bg-white/10 hover:bg-white/20 transition active:scale-95"
           >
-            <Mic2 className="w-4 h-4 text-[#1DB954]" />
+            <Mic2 className="w-4 h-4 text-[#1ed760]" />
             <span>Lyrics</span>
           </button>
 
@@ -242,9 +230,9 @@ export default function MobileNowPlayingModal({
               setIsQueueOpen(true);
               onClose();
             }}
-            className="flex items-center gap-2 text-xs font-bold py-2 px-4 rounded-full glass-pill hover:bg-white/15 transition active:scale-95"
+            className="flex items-center gap-1.5 text-xs font-bold py-2 px-3.5 rounded-full bg-white/10 hover:bg-white/20 transition active:scale-95"
           >
-            <ListMusic className="w-4 h-4 text-[#1DB954]" />
+            <ListMusic className="w-4 h-4 text-[#1ed760]" />
             <span>Queue</span>
           </button>
         </div>
