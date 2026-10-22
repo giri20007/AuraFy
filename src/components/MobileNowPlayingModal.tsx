@@ -66,6 +66,7 @@ export default function MobileNowPlayingModal({
 
   return (
     <div
+      data-testid="mobile-now-playing-modal"
       className="md:hidden fixed inset-0 z-50 flex flex-col justify-between p-6 select-none animate-slide-up overflow-hidden"
       style={{
         background: `linear-gradient(180deg, ${activeColor || '#1e3264'} 0%, #121212 55%, #000000 100%)`,
@@ -74,6 +75,7 @@ export default function MobileNowPlayingModal({
       {/* 1. Top Header Bar */}
       <div className="flex items-center justify-between text-white pt-2">
         <button
+          data-testid="close-now-playing-modal"
           onClick={onClose}
           className="p-2 -ml-2 text-white/80 hover:text-white"
           title="Close"

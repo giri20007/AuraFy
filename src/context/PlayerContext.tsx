@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react';
-import { Track, Playlist, RepeatMode, ActiveView } from '@/types/music';
+import { Track, Playlist, RepeatMode, ActiveView, MusicLanguage } from '@/types/music';
 import { CURATED_PLAYLISTS } from '@/data/curatedPlaylists';
 import confetti from 'canvas-confetti';
 
@@ -24,6 +24,7 @@ interface PlayerContextType {
   activeView: ActiveView;
   selectedPlaylist: Playlist | null;
   searchQuery: string;
+  selectedLanguage: MusicLanguage;
   isLyricsOpen: boolean;
   isQueueOpen: boolean;
   isVideoMode: boolean;
@@ -55,6 +56,7 @@ interface PlayerContextType {
   setActiveView: (view: ActiveView) => void;
   setSelectedPlaylist: (playlist: Playlist | null) => void;
   setSearchQuery: (query: string) => void;
+  setSelectedLanguage: (lang: MusicLanguage) => void;
   setIsLyricsOpen: (open: boolean) => void;
   setIsQueueOpen: (open: boolean) => void;
   setIsVideoMode: (open: boolean) => void;
@@ -86,6 +88,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
   const [activeView, setActiveView] = useState<ActiveView>('home');
   const [selectedPlaylist, setSelectedPlaylist] = useState<Playlist | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [selectedLanguage, setSelectedLanguageState] = useState<MusicLanguage>('all');
   const [isLyricsOpen, setIsLyricsOpen] = useState<boolean>(false);
   const [isQueueOpen, setIsQueueOpen] = useState<boolean>(false);
   const [isVideoMode, setIsVideoMode] = useState<boolean>(false);
@@ -148,6 +151,9 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
 
       const savedVolume = localStorage.getItem('aurafy_volume');
       if (savedVolume) setVolumeState(Number(savedVolume));
+
+      const savedLang = localStorage.getItem('aurafy_language') as MusicLanguage | null;
+      if (savedLang) setSelectedLanguageState(savedLang);
     } catch (e) {
       console.error('Error loading saved state:', e);
     }
@@ -195,10 +201,20 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
+  const setSelectedLanguage = (lang: MusicLanguage) => {
+    setSelectedLanguageState(lang);
+    try {
+      localStorage.setItem('aurafy_language', lang);
+    } catch (e) {}
+  };
+
   const playTrack = (track: Track, newQueue?: Track[]) => {
     setCurrentTrack(track);
     setActiveColor(track.accentColor || '#8400e7');
     setCurrentTime(0);
+    if (track.durationSeconds) {
+      setDuration(track.durationSeconds);
+    }
 
     if (newQueue) {
       const trackIndex = newQueue.findIndex((t) => t.id === track.id);
@@ -451,6 +467,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
         activeView,
         selectedPlaylist,
         searchQuery,
+        selectedLanguage,
         isLyricsOpen,
         isQueueOpen,
         isVideoMode,
@@ -476,6 +493,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
         setActiveView,
         setSelectedPlaylist,
         setSearchQuery,
+        setSelectedLanguage,
         setIsLyricsOpen,
         setIsQueueOpen,
         setIsVideoMode,

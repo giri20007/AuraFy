@@ -3,8 +3,9 @@
 import React, { useState, useEffect } from 'react';
 import { usePlayer } from '@/context/PlayerContext';
 import { CURATED_PLAYLISTS, TOP_ARTISTS } from '@/data/curatedPlaylists';
-import { Track, Playlist } from '@/types/music';
-import { Play, Pause, Heart } from 'lucide-react';
+import { LANGUAGE_OPTIONS, LANGUAGE_ARTISTS, LANGUAGE_PLAYLISTS } from '@/data/languageData';
+import { Track, Playlist, MusicLanguage } from '@/types/music';
+import { Play, Pause, Heart, Search, Sparkles } from 'lucide-react';
 
 export default function HomeView() {
   const {
@@ -17,6 +18,8 @@ export default function HomeView() {
     likedTracks,
     toggleLike,
     isLiked,
+    selectedLanguage,
+    setSelectedLanguage,
   } = usePlayer();
 
   const [greeting, setGreeting] = useState<string>('Welcome');
@@ -28,6 +31,16 @@ export default function HomeView() {
     else if (hour < 18) setGreeting('Good afternoon');
     else setGreeting('Good evening');
   }, []);
+
+  const currentLangOption = LANGUAGE_OPTIONS.find((l) => l.id === selectedLanguage) || LANGUAGE_OPTIONS[0];
+  const langArtists = LANGUAGE_ARTISTS[selectedLanguage] || LANGUAGE_ARTISTS.all;
+  const langPlaylists = LANGUAGE_PLAYLISTS[selectedLanguage] || LANGUAGE_PLAYLISTS.all;
+
+  // Combine playlists for active view
+  const displayPlaylists = [
+    ...langPlaylists,
+    ...(selectedLanguage === 'all' ? CURATED_PLAYLISTS : []),
+  ];
 
   interface QuickAccessItem {
     id: string;
@@ -46,7 +59,7 @@ export default function HomeView() {
       isLikedTile: true,
       tracks: likedTracks,
     },
-    ...CURATED_PLAYLISTS.slice(0, 5).map((pl) => ({
+    ...displayPlaylists.slice(0, 5).map((pl) => ({
       id: pl.id,
       title: pl.title,
       cover: pl.coverUrl,
@@ -56,50 +69,91 @@ export default function HomeView() {
   ];
 
   return (
-    <div className="space-y-7 pb-36 md:pb-16 select-none">
-      {/* Spotify Signature Category Filter Pills: All / Music / Podcasts */}
-      <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pt-1">
-        <button
-          onClick={() => setActiveFilter('all')}
-          className={`px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-bold transition-all ${
-            activeFilter === 'all'
-              ? 'bg-white text-black shadow-md'
-              : 'bg-white/10 text-white hover:bg-white/15'
-          }`}
-        >
-          All
-        </button>
-        <button
-          onClick={() => setActiveFilter('music')}
-          className={`px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-bold transition-all ${
-            activeFilter === 'music'
-              ? 'bg-white text-black shadow-md'
-              : 'bg-white/10 text-white hover:bg-white/15'
-          }`}
-        >
-          Music
-        </button>
-        <button
-          onClick={() => setActiveFilter('podcasts')}
-          className={`px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-bold transition-all ${
-            activeFilter === 'podcasts'
-              ? 'bg-white text-black shadow-md'
-              : 'bg-white/10 text-white hover:bg-white/15'
-          }`}
-        >
-          Podcasts
-        </button>
+    <div className="space-y-6 sm:space-y-7 pb-36 md:pb-16 select-none" data-testid="home-view">
+      {/* 1. Spotify Signature Category Filter Pills + Language Selector */}
+      <div className="space-y-3 pt-1">
+        {/* Top Type Chips */}
+        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
+          <button
+            onClick={() => setActiveFilter('all')}
+            className={`px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-bold transition-all ${
+              activeFilter === 'all'
+                ? 'bg-white text-black shadow-md'
+                : 'bg-white/10 text-white hover:bg-white/15'
+            }`}
+          >
+            All
+          </button>
+          <button
+            onClick={() => setActiveFilter('music')}
+            className={`px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-bold transition-all ${
+              activeFilter === 'music'
+                ? 'bg-white text-black shadow-md'
+                : 'bg-white/10 text-white hover:bg-white/15'
+            }`}
+          >
+            Music
+          </button>
+          <button
+            onClick={() => setActiveFilter('podcasts')}
+            className={`px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-bold transition-all ${
+              activeFilter === 'podcasts'
+                ? 'bg-white text-black shadow-md'
+                : 'bg-white/10 text-white hover:bg-white/15'
+            }`}
+          >
+            Podcasts
+          </button>
+        </div>
+
+        {/* Language Preference Filter Bar */}
+        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5" data-testid="home-language-bar">
+          {LANGUAGE_OPTIONS.map((lang) => {
+            const isSelected = selectedLanguage === lang.id;
+            return (
+              <button
+                key={lang.id}
+                data-testid={`home-lang-pill-${lang.id}`}
+                onClick={() => setSelectedLanguage(lang.id)}
+                className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap transition-all duration-200 ${
+                  isSelected
+                    ? 'bg-[#1DB954] text-black shadow-md shadow-[#1DB954]/25 scale-105'
+                    : 'bg-white/[0.08] hover:bg-white/15 text-white/80 hover:text-white border border-white/5'
+                }`}
+              >
+                <span>{lang.name}</span>
+              </button>
+            );
+          })}
+        </div>
       </div>
 
-      {/* Greeting Header */}
-      <div>
-        <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
-          {greeting}
+      {/* 2. Prominent Mobile Search Bar Trigger */}
+      <div
+        data-testid="home-search-trigger"
+        onClick={() => setActiveView('search')}
+        className="md:hidden glass-card p-3 rounded-full flex items-center gap-3 border border-white/15 hover:border-white/30 cursor-pointer shadow-lg bg-[#1e1e24]/80 active:scale-[0.98] transition"
+      >
+        <Search className="w-4 h-4 text-[#1DB954] ml-2 shrink-0" />
+        <span className="text-xs text-white/60 font-medium truncate">
+          Search songs, artists in {currentLangOption.name}...
+        </span>
+      </div>
+
+      {/* 3. Greeting Header */}
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight flex items-center gap-2">
+          <span>{greeting}</span>
+          {selectedLanguage !== 'all' && (
+            <span className="text-xs sm:text-sm font-bold px-2.5 py-0.5 rounded-full bg-white/10 text-[#1DB954] border border-[#1DB954]/30">
+              {currentLangOption.name}
+            </span>
+          )}
         </h1>
       </div>
 
-      {/* Quick Access Grid (Spotify Signature 6-Card Grid) */}
-      <div className="grid grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-3">
+      {/* 4. Quick Access Grid (Spotify Signature 6-Card Grid) */}
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-3" data-testid="quick-access-grid">
         {quickAccessItems.map((item) => {
           const isItemPlaying =
             item.tracks.some((t) => t.id === currentTrack?.id) && isPlaying;
@@ -115,7 +169,7 @@ export default function HomeView() {
                   setActiveView('playlist');
                 }
               }}
-              className="group flex items-center justify-between bg-white/[0.07] hover:bg-white/[0.14] rounded-md sm:rounded-lg overflow-hidden cursor-pointer transition-all duration-200 relative h-14 sm:h-16 shadow-md"
+              className="group flex items-center justify-between bg-white/[0.07] hover:bg-white/[0.14] rounded-md sm:rounded-lg overflow-hidden cursor-pointer transition-all duration-200 relative h-14 sm:h-16 shadow-md border border-white/5 hover:border-white/15"
             >
               <div className="flex items-center gap-3 min-w-0 flex-1">
                 {item.isLikedTile ? (
@@ -164,21 +218,24 @@ export default function HomeView() {
         })}
       </div>
 
-      {/* SECTION 1: Popular Artists (Circular Cards - Spotify Hallmark) */}
-      <section className="space-y-3">
+      {/* 5. SECTION 1: Popular Artists (Circular Cards - Spotify Hallmark) */}
+      <section className="space-y-3" data-testid="popular-artists-section">
         <div className="flex items-end justify-between">
           <div>
             <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight hover:underline cursor-pointer">
-              Popular artists
+              Popular in {currentLangOption.name}
             </h2>
           </div>
-          <button className="text-xs font-bold text-[#b3b3b3] hover:text-white hover:underline uppercase tracking-wider shrink-0">
+          <button
+            onClick={() => setActiveView('search')}
+            className="text-xs font-bold text-[#b3b3b3] hover:text-white hover:underline uppercase tracking-wider shrink-0"
+          >
             Show all
           </button>
         </div>
 
         <div className="flex md:grid md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4 overflow-x-auto no-scrollbar pb-2 -mx-3 px-3 sm:mx-0 sm:px-0">
-          {TOP_ARTISTS.map((artist) => {
+          {langArtists.map((artist) => {
             const isCurrent = currentTrack?.id === artist.topTrack.id;
             const isTrackPlaying = isCurrent && isPlaying;
 
@@ -186,7 +243,7 @@ export default function HomeView() {
               <div
                 key={artist.id}
                 onClick={() => playTrack(artist.topTrack)}
-                className="group w-36 shrink-0 md:w-auto bg-[#181818]/80 hover:bg-[#282828] p-3.5 rounded-lg cursor-pointer transition-all duration-200 flex flex-col items-center relative shadow-md"
+                className="group w-36 shrink-0 md:w-auto bg-[#181818]/80 hover:bg-[#282828] p-3.5 rounded-xl cursor-pointer transition-all duration-200 flex flex-col items-center relative shadow-md border border-white/5 hover:border-white/15"
               >
                 {/* Circular Artist Avatar with Floating Green Play Button */}
                 <div className="relative aspect-square w-full rounded-full overflow-hidden mb-3 bg-[#282828] shadow-xl">
@@ -231,9 +288,9 @@ export default function HomeView() {
         </div>
       </section>
 
-      {/* SECTION 2+: Curated Playlist Shelves (Albums & Playlists) */}
-      {CURATED_PLAYLISTS.map((playlist) => (
-        <section key={playlist.id} className="space-y-3">
+      {/* 6. SECTION 2+: Curated Playlist Shelves (Albums & Playlists) */}
+      {displayPlaylists.map((playlist) => (
+        <section key={playlist.id} className="space-y-3" data-testid={`playlist-shelf-${playlist.id}`}>
           <div className="flex items-end justify-between">
             <div>
               <h2
@@ -271,7 +328,7 @@ export default function HomeView() {
                 <div
                   key={track.id}
                   onClick={() => playTrack(track, playlist.tracks)}
-                  className="group w-36 shrink-0 md:w-auto bg-[#181818]/80 hover:bg-[#282828] p-3.5 rounded-lg cursor-pointer transition-all duration-200 flex flex-col relative shadow-md"
+                  className="group w-36 shrink-0 md:w-auto bg-[#181818]/80 hover:bg-[#282828] p-3.5 rounded-xl cursor-pointer transition-all duration-200 flex flex-col relative shadow-md border border-white/5 hover:border-white/15"
                 >
                   {/* Square Album Cover with Green Hover Button */}
                   <div className="relative aspect-square w-full rounded-md overflow-hidden mb-3 bg-[#282828] shadow-lg">

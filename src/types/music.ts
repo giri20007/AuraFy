@@ -1,16 +1,28 @@
+export type MusicLanguage =
+  | 'all'
+  | 'hindi'
+  | 'english'
+  | 'tamil'
+  | 'telugu'
+  | 'punjabi'
+  | 'malayalam'
+  | 'spanish'
+  | 'kpop';
+
 export interface Track {
   id: string;
   title: string;
   artist: string;
   album: string;
   thumbnail: string;
-  audioUrl?: string; // Direct audio stream for instant mobile playback
+  audioUrl?: string; // Direct 320kbps audio stream for instant mobile playback
   youtubeId?: string; // YouTube video ID for video mode
   duration: string; // "3:45"
   durationSeconds: number;
   accentColor: string; // Hex color for hero gradient & glass glow e.g. "#8400e7"
   views?: string;
   previewUrl?: string;
+  language?: string;
 }
 
 export interface Playlist {
@@ -22,6 +34,7 @@ export interface Playlist {
   tracks: Track[];
   isCustom?: boolean;
   createdAt?: string;
+  language?: MusicLanguage;
 }
 
 export interface LyricLine {
@@ -32,3 +45,4 @@ export interface LyricLine {
 export type RepeatMode = 'off' | 'all' | 'one';
 
 export type ActiveView = 'home' | 'search' | 'library' | 'playlist' | 'liked';
+

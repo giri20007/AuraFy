@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { cleanYouTubeTitle, getDeterministicColor, formatSecondsToTime } from '@/lib/utils';
+import { parseSaavnSong } from '@/lib/saavn';
 import { Track } from '@/types/music';
 
 export const dynamic = 'force-dynamic';
@@ -8,6 +9,7 @@ export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
     const query = searchParams.get('q');
+    const lang = searchParams.get('lang') || 'all';
 
     if (!query || query.trim().length === 0) {
       return NextResponse.json({ tracks: [] });
@@ -15,7 +17,57 @@ export async function GET(request: NextRequest) {
 
     const trimmedQuery = query.trim();
 
-    // 1. Try Deezer Search API (Free, high quality 1000x1000 art, direct CDN audio)
+    // 1. Primary Engine: JioSaavn (Full 320kbps direct AAC streams, all Indian & global languages)
+    try {
+      const cookieHeader = lang && lang !== 'all' ? `L=${encodeURIComponent(lang)};` : 'L=english,hindi,tamil,telugu,punjabi;';
+      const saavnUrl = `https://www.jiosaavn.com/api.php?__call=search.getResults&_format=json&_marker=0&api_version=4&ctx=web6dot0&n=30&p=1&q=${encodeURIComponent(
+        trimmedQuery
+      )}`;
+
+      const saavnRes = await fetch(saavnUrl, {
+        headers: {
+          'User-Agent':
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+          Cookie: cookieHeader,
+        },
+        next: { revalidate: 300 },
+      });
+
+      if (saavnRes.ok) {
+        const saavnData = await saavnRes.json();
+        if (Array.isArray(saavnData.results) && saavnData.results.length > 0) {
+          const saavnTracks: Track[] = saavnData.results
+            .map(parseSaavnSong)
+            .filter((t: Track | null): t is Track => t !== null && Boolean(t.audioUrl));
+
+          // Filter out instrumental/karaoke versions unless specifically requested
+          const genuineTracks = saavnTracks.filter((t) => {
+            const titleLower = t.title.toLowerCase();
+            const queryLower = trimmedQuery.toLowerCase();
+            if (queryLower.includes('karaoke') || queryLower.includes('instrumental')) {
+              return true;
+            }
+            return (
+              !titleLower.includes('instrumental karaoke') &&
+              !titleLower.includes('melody karaoke') &&
+              !titleLower.includes('originally perfomed by') &&
+              !titleLower.includes('originally performed by')
+            );
+          });
+
+          const returnTracks = genuineTracks.length > 0 ? genuineTracks : saavnTracks;
+
+          // If we found good genuine tracks with direct 320kbps audio, return them!
+          if (returnTracks.length > 0) {
+            return NextResponse.json({ tracks: returnTracks });
+          }
+        }
+      }
+    } catch (saavnErr) {
+      console.warn('Saavn primary search error, falling back:', saavnErr);
+    }
+
+    // 2. Secondary Engine: Deezer Search API (Official global CDN audio & 1000x1000 artwork)
     try {
       const deezerRes = await fetch(
         `https://api.deezer.com/search?q=${encodeURIComponent(trimmedQuery)}&limit=25`,
@@ -61,10 +113,10 @@ export async function GET(request: NextRequest) {
         }
       }
     } catch (deezerErr) {
-      console.warn('Deezer search fallback triggered:', deezerErr);
+      console.warn('Deezer fallback error:', deezerErr);
     }
 
-    // 2. Fallback to iTunes Search API (Official Apple, zero rate limits)
+    // 3. Tertiary Engine: iTunes Search API (Official Apple Music CDN)
     try {
       const itunesRes = await fetch(
         `https://itunes.apple.com/search?term=${encodeURIComponent(
@@ -100,13 +152,12 @@ export async function GET(request: NextRequest) {
         }
       }
     } catch (itunesErr) {
-      console.warn('iTunes search fallback triggered:', itunesErr);
+      console.warn('iTunes fallback error:', itunesErr);
     }
 
     return NextResponse.json({ tracks: [] });
   } catch (error) {
     console.error('Search endpoint fatal error:', error);
-    // Never crash with 500, return safe empty array
     return NextResponse.json({ tracks: [] });
   }
 }

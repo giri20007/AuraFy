@@ -10,6 +10,7 @@ export default function MobileBottomNav() {
   return (
     <nav className="md:hidden fixed bottom-0 inset-x-0 h-16 bg-[#121212]/95 backdrop-blur-xl border-t border-[#282828] z-40 flex items-center justify-around px-4 select-none pb-safe">
       <button
+        data-testid="bottom-nav-home"
         onClick={() => {
           setSelectedPlaylist(null);
           setActiveView('home');
@@ -27,6 +28,7 @@ export default function MobileBottomNav() {
       </button>
 
       <button
+        data-testid="bottom-nav-search"
         onClick={() => {
           setSelectedPlaylist(null);
           setActiveView('search');
@@ -44,6 +46,7 @@ export default function MobileBottomNav() {
       </button>
 
       <button
+        data-testid="bottom-nav-library"
         onClick={() => {
           setSelectedPlaylist(null);
           setActiveView('library');

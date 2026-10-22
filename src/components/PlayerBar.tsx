@@ -77,7 +77,7 @@ export default function PlayerBar() {
   };
 
   return (
-    <footer className="hidden md:flex h-[90px] bg-black border-t border-[#282828] px-4 items-center justify-between select-none z-50">
+    <footer data-testid="desktop-player-bar" className="hidden md:flex h-[90px] bg-black border-t border-[#282828] px-4 items-center justify-between select-none z-50">
       {/* 1. LEFT: Track Info (30%) */}
       <div className="flex items-center gap-3.5 w-[30%] min-w-[180px] max-w-[340px]">
         {currentTrack ? (
@@ -162,6 +162,7 @@ export default function PlayerBar() {
 
           {/* White Circular Play/Pause Button */}
           <button
+            data-testid="player-play-button"
             onClick={togglePlayPause}
             className="w-8 h-8 rounded-full bg-white hover:scale-105 active:scale-95 text-black flex items-center justify-center transition shadow-md"
             title={isPlaying ? 'Pause' : 'Play'}

@@ -47,6 +47,7 @@ export default function Sidebar({ onOpenCreateModal }: SidebarProps) {
       <div className="bg-[#121212] rounded-lg p-5 flex flex-col gap-5 shadow-lg border border-white/[0.04]">
         {/* Spotify / AuraFy Logo */}
         <div
+          data-testid="sidebar-brand"
           onClick={() => {
             setActiveView('home');
             setSelectedPlaylist(null);
@@ -59,8 +60,8 @@ export default function Sidebar({ onOpenCreateModal }: SidebarProps) {
               <path d="M12 2C6.477 2 2 6.477 2 12c0 5.524 4.477 10 10 10s10-4.476 10-10c0-5.523-4.477-10-10-10zm4.586 14.424c-.18.295-.563.387-.857.208-2.35-1.435-5.308-1.76-8.792-.963-.334.077-.67-.13-.746-.464-.077-.334.13-.67.464-.746 3.808-.87 7.076-.496 9.723 1.119.294.18.387.562.208.846zm1.225-2.724c-.226.367-.71.482-1.077.256-2.69-1.654-6.79-2.134-9.97-1.168-.413.125-.853-.107-.978-.52-.125-.413.107-.853.52-.978 3.633-1.103 8.147-.568 11.249 1.333.367.226.482.71.256 1.077zm.105-2.835C14.692 8.95 8.085 8.732 4.24 9.9c-.496.15-1.022-.134-1.173-.63-.15-.496.134-1.022.63-1.173 4.417-1.34 11.73-1.082 15.568 1.196.446.265.592.842.327 1.288-.265.446-.842.592-1.288.327z"/>
             </svg>
           </div>
-          <span className="font-extrabold text-xl tracking-tight text-white">
-            Spotify
+          <span className="font-extrabold text-xl tracking-tight text-white flex items-center gap-1.5">
+            Spotify <span className="text-xs font-bold px-1.5 py-0.5 rounded bg-white/10 text-[#1ed760] border border-[#1ed760]/30 tracking-normal">AuraFy</span>
           </span>
         </div>
 

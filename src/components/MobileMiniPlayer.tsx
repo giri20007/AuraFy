@@ -27,6 +27,7 @@ export default function MobileMiniPlayer({ onOpenFullPlayer }: MobileMiniPlayerP
 
   return (
     <div
+      data-testid="mobile-mini-player"
       onClick={onOpenFullPlayer}
       className="md:hidden fixed bottom-[62px] inset-x-2 h-14 rounded-md bg-[#242424] shadow-2xl z-40 flex items-center justify-between px-2.5 overflow-hidden cursor-pointer select-none active:scale-[0.99] transition-transform duration-150 border border-white/5"
       style={{
